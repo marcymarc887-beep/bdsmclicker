@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BDSM Clicker+</title>
+  <style>
+    body { font-family: sans-serif; background:#111; color:#eee; display:flex; flex-direction:column; align-items:center; padding:20px; }
+    h1 { color:#c53030; font-size:1.8rem; text-align:center; }
+    #langSelect { margin:10px; padding:8px; background:#222; color:#eee; border:1px solid #c53030; border-radius:8px; font-size:1rem; }
+    #nameInput { margin:10px; padding:8px; background:#222; color:#eee; border:1px solid #c53030; border-radius:8px; font-size:1rem; min-width:200px; text-align:center; }
+    #counter { font-size:2.5rem; margin:15px; text-align:center; }
+    button { padding:10px 20px; font-size:1rem; cursor:pointer; background:#c53030; color:white; border:none; border-radius:12px; flex-shrink:0; }
+    button:disabled { background:#555; cursor:not-allowed; }
+    #updaterRow { display:flex; gap:20px; margin-top:20px; flex-wrap:wrap; justify-content:center; }
+    .updaterBlock { display:flex; flex-direction:column; gap:10px; min-width:200px; }
+    .updaterBlock.hidden { display:none; }
+    .upgrader { display:flex; justify-content:space-between; align-items:center; background:#222; padding:10px 15px; border-radius:12px; flex-wrap:wrap; }
+    .upgrader.hidden { display:none; }
+    .upgrader span { max-width:150px; word-wrap:break-word; font-size:0.9rem; }
+    #meters { display:flex; gap:10px; margin:15px; flex-wrap:wrap; justify-content:center; }
+    .meterbox { background:#222; padding:8px 15px; border-radius:12px; min-width:120px; text-align:center; }
+    #rank { margin-top:15px; font-size:1.2rem; color:#c53030; text-align:center; }
+    #clickRow { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:15px; }
+    #achievement { margin:20px; padding:15px; background:#c53030; border-radius:12px; font-weight:bold; max-width:500px; text-align:center; display:none; }
+    @media (max-width: 500px) {
+      #updaterRow { flex-direction: column; }
+      .updaterBlock { width:100%; }
+      .upgrader { flex-direction: column; align-items:flex-start; gap:5px; }
+      button { width:100%; }
+      .upgrader span { max-width:100%; }
+    }
+  </style>
+</head>
+<body>
+  <select id="langSelect">
+    <option value="de">Deutsch</option>
+    <option value="en">English</option>
+    <option value="es">Español</option>
+    <option value="fr">Français</option>
+    <option value="it">Italiano</option>
+    <option value="pt">Português</option>
+    <option value="nl">Nederlands</option>
+    <option value="pl">Polski</option>
+    <option value="ru">Русский</option>
+    <option value="ja">日本語</option>
+  </select>
+
+  <h1 id="title">BDSM Themed Clicker+</h1>
+  <p id="flavour">Einvernehmliches, stilisiertes Machtspiel zwischen Erwachsenen</p>
+
+  <input type="text" id="nameInput" placeholder="Dein Name..." maxlength="20">
+
+  <div id="counter">0</div>
+
+  <div id="clickRow">
+    <button id="clickBtn">Diene mir!</button>
+  </div>
+
+  <h2 id="roleTitle">Rolle wählen</h2>
+  <button id="chooseDom">Ich bin Dominant</button>
+  <button id="chooseSub">Ich bin Submissiv</button>
+  <p id="roleText">Keine Rolle gewählt.</p>
+
+  <div id="meters">
+    <div class="meterbox"><span id="domLabel">Dominanz</span>: <span id="domMeter">0</span></div>
+    <div class="meterbox"><span id="subLabel">Devotion</span>: <span id="subMeter">0</span></div>
+  </div>
+
+  <div id="rank">Rang: Ungewiss</div>
+  <div id="achievement"></div>
+
+  <div id="updaterRow">
+    <div class="updaterBlock" id="blockManual">
+      <h3 id="manualTitle">Hand anlegen</h3>
+      <div class="upgrader" id="manual1"><span id="manual1Text">Aufwärmen (+2/Klick) – <span id="manual1Cost">30</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="manual2"><span id="manual2Text">Sanfte Schläge (+3/Klick) – <span id="manual2Cost">60</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="manual3"><span id="manual3Text">Feste Schläge (+5/Klick) – <span id="manual3Cost">100</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="manual4"><span id="manual4Text">Rhythmisches Spanking (+8/Klick) – <span id="manual4Cost">150</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="manual5"><span id="manual5Text">Intensive Handspanks (+12/Klick) – <span id="manual5Cost">220</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="manual6"><span id="manual6Text">Kräftiges Durchgreifen (+18/Klick) – <span id="manual6Cost">320</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="manual7"><span id="manual7Text">Meisterhafte Hand (+25/Klick) – <span id="manual7Cost">450</span></span><button>Kaufen</button></div>
+    </div>
+
+    <div class="updaterBlock hidden" id="blockSpanking">
+      <h3 id="spankingTitle">Spankinggeräte</h3>
+      <div class="upgrader" id="auto1"><span id="auto1Text">Weiche Peitsche (+2/sec) – <span id="auto1Cost">250</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="auto2"><span id="auto2Text">Paddle (+4/sec) – <span id="auto2Cost">400</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="auto3"><span id="auto3Text">Riding Crop (+7/sec) – <span id="auto3Cost">600</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="auto4"><span id="auto4Text">Flogger (+11/sec) – <span id="auto4Cost">900</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="auto5"><span id="auto5Text">Lederriemen (+16/sec) – <span id="auto5Cost">1400</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="auto6"><span id="auto6Text">Cane/Rohrstock (+23/sec) – <span id="auto6Cost">2100</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="auto7"><span id="auto7Text">Intensiv-Set (+32/sec) – <span id="auto7Cost">3200</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="auto8"><span id="auto8Text">Premium-Kollektion (+45/sec) – <span id="auto8Cost">4800</span></span><button>Kaufen</button></div>
+    </div>
+
+    <div class="updaterBlock hidden" id="blockChastity">
+      <h3 id="chastityTitle">Keuschhaltung</h3>
+      <div class="upgrader" id="chast1"><span id="chast1Text">Orgasmusverweigerung (+3/Klick, +15/sec) – <span id="chast1Cost">5000</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="chast2"><span id="chast2Text">Peniskäfig (+5/Klick, +28/sec) – <span id="chast2Cost">8000</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="chast3"><span id="chast3Text">Strap-On Training (+8/Klick, +45/sec) – <span id="chast3Cost">12000</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="chast4"><span id="chast4Text">Verlängertes Denial (+12/Klick, +70/sec) – <span id="chast4Cost">18000</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="chast5"><span id="chast5Text">Ruinierte Orgasmen (+18/Klick, +105/sec) – <span id="chast5Cost">27000</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="chast6"><span id="chast6Text">Totale Kontrolle (+25/Klick, +150/sec) – <span id="chast6Cost">40000</span></span><button>Kaufen</button></div>
+    </div>
+
+    <div class="updaterBlock hidden" id="blockBondage">
+      <h3 id="bondageTitle">Bondage</h3>
+      <div class="upgrader" id="bond1"><span id="bond1Text">Handschellen (+40/Klick, +200/sec) – <span id="bond1Cost">15000</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="bond2"><span id="bond2Text">Seile & Shibari (+65/Klick, +350/sec) – <span id="bond2Cost">25000</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="bond3"><span id="bond3Text">Spreizstangen (+100/Klick, +550/sec) – <span id="bond3Cost">40000</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="bond4"><span id="bond4Text">Halsband & Leine (+150/Klick, +850/sec) – <span id="bond4Cost">65000</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="bond5"><span id="bond5Text">Suspension Gear (+230/Klick, +1300/sec) – <span id="bond5Cost">100000</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="bond6"><span id="bond6Text">Käfig (+350/Klick, +2000/sec) – <span id="bond6Cost">150000</span></span><button>Kaufen</button></div>
+    </div>
+
+    <div class="updaterBlock hidden" id="blockToys">
+      <h3 id="toysTitle">Spielzeug</h3>
+      <div class="upgrader" id="toy1"><span id="toy1Text">Wachskerzen (+500/Klick, +3000/sec) – <span id="toy1Cost">60000</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="toy2"><span id="toy2Text">Knebel (+800/Klick, +5000/sec) – <span id="toy2Cost">100000</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="toy3"><span id="toy3Text">Augenmaske (+1200/Klick, +8000/sec) – <span id="toy3Cost">160000</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="toy4"><span id="toy4Text">Nippelklemmen (+1800/Klick, +12000/sec) – <span id="toy4Cost">250000</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="toy5"><span id="toy5Text">Elektrostimulation (+2700/Klick, +18000/sec) – <span id="toy5Cost">400000</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="toy6"><span id="toy6Text">Premium Plug-Set (+4000/Klick, +27000/sec) – <span id="toy6Cost">650000</span></span><button>Kaufen</button></div>
+      <div class="upgrader hidden" id="toy7"><span id="toy7Text">Tease & Denial Vibrator (+6000/Klick, +40000/sec) – <span id="toy7Cost">1000000</span></span><button>Kaufen</button></div>
+    </div>
+  </div>
+
+  <script>
+    const translations = {
+      de: {
+        title: 'BDSM Themed Clicker+',
+        flavour: 'Einvernehmliches, stilisiertes Machtspiel zwischen Erwachsenen',
+        namePlaceholder: 'Dein Name...',
+        clickBtn: 'Diene mir!',
+        clickBtnDom: 'Verteile Spankings',
+        clickBtnSub: 'Empfange Spankings',
+        roleTitle: 'Rolle wählen',
+        chooseDom: 'Ich bin Dominant',
+        chooseSub: 'Ich bin Submissiv',
+        roleText: 'Keine Rolle gewählt.',
+        roleTextDom: 'Dominant – ruhige, verantwortungsvolle Kontrolle.',
+        roleTextSub: 'Submissiv – freiwillige Hingabe und Ordnung.',
+        domLabel: 'Dominanz',
+        subLabel: 'Devotion',
+        rank: 'Rang',
+        rankUnknown: 'Ungewiss',
+        rankDom1: 'Neuling',
+        rankDom2: 'Anleitender',
+        rankDom3: 'Strukturgeber',
+        rankDom4: 'Disziplinführer',
+        rankDom5: 'Erfahrener Dom',
+        rankDom6: 'Meister/in',
+        rankDom7: 'Großmeister/in',
+        rankDom8: 'Legende der Kontrolle',
+        rankSub1: 'Neuling',
+        rankSub2: 'Gelehriger',
+        rankSub3: 'Treuer Diener',
+        rankSub4: 'Gehorsamer Adept',
+        rankSub5: 'Erfahrener Sub',
+        rankSub6: 'Devoter Meister',
+        rankSub7: 'Elite Servant',
+        rankSub8: 'Perfekte Hingabe',
+        manualTitle: 'Hand anlegen',
+        spankingTitle: 'Spankinggeräte',
+        chastityTitle: 'Keuschhaltung',
+        bondageTitle: 'Bondage',
+        toysTitle: 'Spielzeug',
+        buy: 'Kaufen',
+        achievement100: '{name}, du machst Fortschritte! Weiter so!',
+        achievement500: '{name}, du entwickelst einen Geschmack dafür...',
+        achievement1000: 'Beeindruckend, {name}! Du verstehst die Dynamik.',
+        achievement5000: '{name}, du bist auf dem Weg zur Meisterschaft!',
+        achievement10000: 'Außergewöhnlich, {name}! Deine Hingabe ist bemerkenswert.',
+        achievement25000: '{name}, du bist ein Vorbild in deiner Rolle!',
+        achievement50000: 'Legendär, {name}! Nur wenige erreichen dieses Niveau.',
+        achievement100000: '{name}, du hast die absolute Perfektion erreicht!',
+        manual1: 'Aufwärmen (+2/Klick)',
+        manual2: 'Sanfte Schläge (+3/Klick)',
+        manual3: 'Feste Schläge (+5/Klick)',
+        manual4: 'Rhythmisches Spanking (+8/Klick)',
+        manual5: 'Intensive Handspanks (+12/Klick)',
+        manual6: 'Kräftiges Durchgreifen (+18/Klick)',
+        manual7: 'Meisterhafte Hand (+25/Klick)',
+        auto1: 'Weiche Peitsche (+2/sec)',
+        auto2: 'Paddle (+4/sec)',
+        auto3: 'Riding Crop (+7/sec)',
+        auto4: 'Flogger (+11/sec)',
+        auto5: 'Lederriemen (+16/sec)',
+        auto6: 'Cane/Rohrstock (+23/sec)',
+        auto7: 'Intensiv-Set (+32/sec)',
+        auto8: 'Premium-Kollektion (+45/sec)',
+        chast1: 'Orgasmusverweigerung (+3/Klick, +15/sec)',
+        chast2: 'Peniskäfig (+5/Klick, +28/sec)',
+        chast3: 'Strap-On Training (+8/Klick, +45/sec)',
+        chast4: 'Verlängertes Denial (+12/Klick, +70/sec)',
+        chast5: 'Ruinierte Orgasmen (+18/Klick, +105/sec)',
+        chast6: 'Totale Kontrolle (+25/Klick, +150/sec)',
+        bond1: 'Handschellen (+40/Klick, +200/sec)',
+        bond2: 'Seile & Shibari (+65/Klick, +350/sec)',
+        bond3: 'Spreizstangen (+100/Klick, +550/sec)',
+        bond4: 'Halsband & Leine (+150/Klick, +850/sec)',
+        bond5: 'Suspension Gear (+230/Klick, +1300/sec)',
+        bond6: 'Käfig (+350/Klick, +2000/sec)',
+        toy1: 'Wachskerzen (+500/Klick, +3000/sec)',
+        toy2: 'Knebel (+800/Klick, +5000/sec)',
+        toy3: 'Augenmaske (+1200/Klick, +8000/sec)',
+        toy4: 'Nippelklemmen (+1800/Klick, +12000/sec)',
+        toy5: 'Elektrostimulation (+2700/Klick, +18000/sec)',
+        toy6: 'Premium Plug-Set (+4000/Klick, +27000/sec)',
+        toy7: 'Tease & Denial Vibrator (+6000/Klick, +40000/sec)'
+      },
+      en: {
+        title: 'BDSM Themed Clicker+',
+        flavour: 'Consensual, stylized power play between adults',
+        namePlaceholder: 'Your name...',
+        clickBtn: 'Serve me!',
+        clickBtnDom: 'Give Spankings',
+        clickBtnSub: 'Receive Spankings',
+        roleTitle: 'Choose Role',
+        chooseDom: 'I am Dominant',
+        chooseSub: 'I am Submissive',
+        roleText: 'No role selected.',
+        roleTextDom: 'Dominant – calm, responsible control.',
+        roleTextSub: 'Submissive – voluntary devotion and order.',
+        domLabel: 'Dominance',
+        subLabel: 'Devotion',
+        rank: 'Rank',
+        rankUnknown: 'Unknown',
+        rankDom1: 'Novice',
+        rankDom2: 'Guide',
+        rankDom3: 'Structure Provider',
+        rankDom4: 'Discipline Leader',
+        rankDom5: 'Experienced Dom',
+        rankDom6: 'Master',
+        rankDom7: 'Grandmaster',
+        rankDom8: 'Legend of Control',
+        rankSub1: 'Novice',
+        rankSub2: 'Eager Learner',
+        rankSub3: 'Loyal Servant',
+        rankSub4: 'Obedient Adept',
+        rankSub5: 'Experienced Sub',
+        rankSub6: 'Devoted Master',
+        rankSub7: 'Elite Servant',
+        rankSub8: 'Perfect Devotion',
+        manualTitle: 'Manual Touch',
+        spankingTitle: 'Spanking Tools',
+        chastityTitle: 'Chastity',
+        bondageTitle: 'Bondage',
+        toysTitle: 'Toys',
+        buy: 'Buy',
+        achievement100: '{name}, you\'re making progress! Keep going!',
+        achievement500: '{name}, you\'re developing a taste for it...',
+        achievement1000: 'Impressive, {name}! You understand the dynamic.',
+        achievement5000: '{name}, you\'re on the path to mastery!',
+        achievement10000: 'Exceptional, {name}! Your dedication is remarkable.',
+        achievement25000: '{name}, you\'re a role model in your position!',
+        achievement50000: 'Legendary, {name}! Few reach this level.',
+        achievement100000: '{name}, you\'ve achieved absolute perfection!',
+        manual1: 'Warm-up (+2/click)',
+        manual2: 'Gentle Slaps (+3/click)',
+        manual3: 'Firm Slaps (+5/click)',
+        manual4: 'Rhythmic Spanking (+8/click)',
+        manual5: 'Intense Hand Spanks (+12/click)',
+        manual6: 'Powerful Strike (+18/click)',
+        manual7: 'Masterful Hand (+25/click)',
+        auto1: 'Soft Whip (+2/sec)',
+        auto2: 'Paddle (+4/sec)',
+        auto3: 'Riding Crop (+7/sec)',
+        auto4: 'Flogger (+11/sec)',
+        auto5: 'Leather Strap (+16/sec)',
+        auto6: 'Cane (+23/sec)',
+        auto7: 'Intense Set (+32/sec)',
+        auto8: 'Premium Collection (+45/sec)',
+        chast1: 'Orgasm Denial (+3/click, +15/sec)',
+        chast2: 'Penis Cage (+5/click, +28/sec)',
+        chast3: 'Strap-On Training (+8/click, +45/sec)',
+        chast4: 'Extended Denial (+12/click, +70/sec)',
+        chast5: 'Ruined Orgasms (+18/click, +105/sec)',
+        chast6: 'Total Control (+25/click, +150/sec)',
+        bond1: 'Handcuffs (+40/click, +200/sec)',
+        bond2: 'Ropes & Shibari (+65/click, +350/sec)',
+        bond3: 'Spreader Bar (+100/click, +550/sec)',
+        bond4: 'Collar & Leash (+150/click, +850/sec)',
+        bond5: 'Suspension Gear (+230/click, +1300/sec)',
+        bond6: 'Cage (+350/click, +2000/sec)',
+        toy1: 'Wax Candles (+500/click, +3000/sec)',
+        toy2: 'Gag (+800/click, +5000/sec)',
+        toy3: 'Blindfold (+1200/click, +8000/sec)',
+        toy4: 'Nipple Clamps (+1800/click, +12000/sec)',
+        toy5: 'Electrostimulation (+2700/click, +18000/sec)',
+        toy6: 'Premium Plug Set (+4000/click, +27000/sec)',
+        toy7: 'Tease & Denial Vibrator (+6000/click, +40000/sec)'
+      },
+      es: {
+        title: 'BDSM Themed Clicker+',
+        flavour: 'Juego de poder consensual y estilizado entre adultos',
+        namePlaceholder: 'Tu nombre...',
+        clickBtn: '¡Sírveme!',
+        clickBtnDom: 'Dar Nalgadas',
+        clickBtnSub: 'Recibir Nalgadas',
+        roleTitle: 'Elegir Rol',
+        chooseDom: 'Soy Dominante',
+        chooseSub: 'Soy Sumiso/a',
+        roleText: 'Ningún rol seleccionado.',
+        roleTextDom: 'Dominante – control tranquilo y responsable.',
+        roleTextSub: 'Sumiso/a – devoción voluntaria y orden.',
+        domLabel: 'Dominancia',
+        subLabel: 'Devoción',
+        rank: 'Rango',
+        rankUnknown: 'Desconocido',
+        rankDom1: 'Novato',
+        rankDom2: 'Guía',
+        rankDom3: 'Proveedor de Estructura',
+        rankDom4: 'Líder de Disciplina',
+        rankDom5: 'Dom Experimentado',
+        rankDom6: 'Maestro',
+        rankDom7: 'Gran Maestro',
+        rankDom8: 'Leyenda del Control',
+        rankSub1: 'Novato',
+        rankSub2: 'Aprendiz Entusiasta',
+        rankSub3: 'Sirviente Leal',
+        rankSub4: 'Adepto Obediente',
+        rankSub5: 'Sub Experimentado',
+        rankSub6: 'Maestro Devoto',
+        rankSub7: 'Sirviente Élite',
+        rankSub8: 'Devoción Perfecta',
+        manualTitle: 'Mano',
+        spankingTitle: 'Herramientas de Nalgadas',
+        chastityTitle: 'Castidad',
+        bondageTitle: 'Bondage',
+        toysTitle: 'Juguetes',
+        buy: 'Comprar',
+        achievement100: '¡{name}, estás progresando! ¡Continúa así!',
+        achievement500: '{name}, estás desarrollando gusto por esto...',
+        achievement1000: '¡Impresionante, {name}! Entiendes la dinámica.',
+        achievement5000: '¡{name}, estás en camino a la maestría!',
+        achievement10000: '¡Excepcional, {name}! Tu dedicación es notable.',
+        achievement25000: '¡{name}, eres un modelo en tu rol!',
+        achievement50000: '¡Legendario, {name}! Pocos alcanzan este nivel.',
+        achievement100000: '¡{name}, has alcanzado la perfección absoluta!',
+        manual1: 'Calentamiento (+2/clic)',
+        manual2: 'Palmadas Suaves (+3/clic)',
+        manual3: 'Palmadas Firmes (+5/clic)',
+        manual4: 'Nalgadas Rítmicas (+8/clic)',
+        manual5: 'Nalgadas Intensas (+12/clic)',
+        manual6: 'Golpe Poderoso (+18/clic)',
+        manual7: 'Mano Magistral (+25/clic)',
+        auto1: 'Látigo Suave (+2/seg)',
+        auto2: 'Paleta (+4/seg)',
+        auto3: 'Fusta (+7/seg)',
+        auto4: 'Azotador (+11/seg)',
+        auto5: 'Correa de Cuero (+16/seg)',
+        auto6: 'Vara (+23/seg)',
+        auto7: 'Set Intenso (+32/seg)',
+        auto8: 'Colección Premium (+45/seg)',
+        chast1: 'Negación del Orgasmo (+3/clic, +15/seg)',
+        chast2: 'Jaula de Pene (+5/clic, +28/seg)',
+        chast3: 'Entrenamiento con Strap-On (+8/clic, +45/seg)',
+        chast4: 'Negación Extendida (+12/clic, +70/seg)',
+        chast5: 'Orgasmos Arruinados (+18/clic, +105/seg)',
+        chast6: 'Control Total (+25/clic, +150/seg)',
+        bond1: 'Esposas (+40/clic, +200/seg)',
+        bond2: 'Cuerdas & Shibari (+65/clic, +350/seg)',
+        bond3: 'Barra Separadora (+100/clic, +550/seg)',
+        bond4: 'Collar & Correa (+150/clic, +850/seg)',
+        bond5: 'Equipo de Suspensión (+230/clic, +1300/seg)',
+        bond6: 'Jaula (+350/clic, +2000/seg)',
+        toy1: 'Velas de Cera (+500/clic, +3000/seg)',
+        toy2: 'Mordaza (+800/clic, +5000/seg)',
+        toy3: 'Venda para Ojos (+1200/clic, +8000/seg)',
+        toy4: 'Pinzas para Pezones (+1800/clic, +12000/seg)',
+        toy5: 'Electroestimulación (+2700/clic, +18000/seg)',
+        toy6: 'Set Premium de Plugs (+4000/clic, +27000/seg)',
+        toy7: 'Vibrador Tease & Denial (+6000/clic, +40000/seg)'
+      },
+      fr: {
+        title: 'BDSM Themed Clicker+',
+        flavour: 'Jeu de pouvoir consensuel et stylisé entre adultes',
+        namePlaceholder: 'Votre nom...',
+        clickBtn: 'Sers-moi!',
+        clickBtnDom: 'Donner des Fessées',
+        clickBtnSub: 'Recevoir des Fessées',
+        roleTitle: 'Choisir un Rôle',
+        chooseDom: 'Je suis Dominant(e)',
+        chooseSub: 'Je suis Soumis(e)',
+        roleText: 'Aucun rôle sélectionné.',
+        roleTextDom: 'Dominant(e) – contrôle calme et responsable.',
+        roleTextSub: 'Soumis(e) – dévotion volontaire et ordre.',
+        domLabel: 'Dominance',
+        subLabel: 'Dévotion',
+        rank: 'Rang',
+        rankUnknown: 'Inconnu',
+        rankDom1: 'Novice',
+        rankDom2: 'Guide',
+        rankDom3: 'Fournisseur de Structure',
+        rankDom4: 'Leader de Discipline',
+        rankDom5: 'Dom Expérimenté',
+        rankDom6: 'Maître',
+        rankDom7: 'Grand Maître',
+        rankDom8: 'Légende du Contrôle',
+        rankSub1: 'Novice',
+        rankSub2: 'Apprenant Enthousiaste',
+        rankSub3: 'Serviteur Loyal',
+        rankSub4: 'Adepte Obéissant',
+        rankSub5: 'Sub Expérimenté',
+        rankSub6: 'Maître Dévoué',
+        rankSub7: 'Serviteur Élite',
+        rankSub8: 'Dévotion Parfaite',
+        manualTitle: 'Main',
+        spankingTitle: 'Outils de Fessée',
+        chastityTitle: 'Chasteté',
+        bondageTitle: 'Bondage',
+        toysTitle: 'Jouets',
+        buy: 'Acheter',
+        achievement100: '{name}, vous progressez! Continuez!',
+        achievement500: '{name}, vous développez un goût pour cela...',
+        achievement1000: 'Impressionnant, {name}! Vous comprenez la dynamique.',
+        achievement5000: '{name}, vous êtes sur la voie de la maîtrise!',
+        achievement10000: 'Exceptionnel, {name}! Votre dévouement est remarquable.',
+        achievement25000: '{name}, vous êtes un modèle dans votre rôle!',
+        achievement50000: 'Légendaire, {name}! Peu atteignent ce niveau.',
+        achievement100000: '{name}, vous avez atteint la perfection absolue!',
+        manual1: 'Échauffement (+2/clic)',
+        manual2: 'Claques Douces (+3/clic)',
+        manual3: 'Claques Fermes (+5/clic)',
+        manual4: 'Fessée Rythmique (+8/clic)',
+        manual5: 'Fessées Intenses (+12/clic)',
+        manual6: 'Frappe Puissante (+18/clic)',
+        manual7: 'Main Magistrale (+25/clic)',
+        auto1: 'Fouet Doux (+2/sec)',
+        auto2: 'Paddle (+4/sec)',
+        auto3: 'Cravache (+7/sec)',
+        auto4: 'Fouet (+11/sec)',
+        auto5: 'Lanière de Cuir (+16/sec)',
+        auto6: 'Canne (+23/sec)',
+        auto7: 'Set Intensif (+32/sec)',
+        auto8: 'Collection Premium (+45/sec)',
+        chast1: 'Déni d\'Orgasme (+3/clic, +15/sec)',
+        chast2: 'Cage Pénienne (+5/clic, +28/sec)',
+        chast3: 'Entraînement Strap-On (+8/clic, +45/sec)',
+        chast4: 'Déni Prolongé (+12/clic, +70/sec)',
+        chast5: 'Orgasmes Ruinés (+18/clic, +105/sec)',
+        chast6: 'Contrôle Total (+25/clic, +150/sec)',
+        bond1: 'Menottes (+40/clic, +200/sec)',
+        bond2: 'Cordes & Shibari (+65/clic, +350/sec)',
+        bond3: 'Barre d\'Écartement (+100/clic, +550/sec)',
+        bond4: 'Collier & Laisse (+150/clic, +850/sec)',
+        bond5: 'Équipement de Suspension (+230/clic, +1300/sec)',
+        bond6: 'Cage (+350/clic, +2000/sec)',
+        toy1: 'Bougies de Cire (+500/clic, +3000/sec)',
+        toy2: 'Bâillon (+800/clic, +5000/sec)',
+        toy3: 'Bandeau (+1200/clic, +8000/sec)',
+        toy4: 'Pinces à Tétons (+1800/clic, +12000/sec)',
+        toy5: 'Électrostimulation (+2700/clic, +18000/sec)',
+        toy6: 'Set Premium de Plugs (+4000/clic, +27000/sec)',
+        toy7: 'Vibromasseur Tease & Denial (+6000/clic, +40000/sec)'
+      },
+      it: {
+        title: 'BDSM Themed Clicker+',
+        flavour: 'Gioco di potere consensuale e stilizzato tra adulti',
+        namePlaceholder: 'Il tuo nome...',
+        clickBtn: 'Servimi!',
+        clickBtnDom: 'Dare Sculacciate',
+        clickBtnSub: 'Ricevere Sculacciate',
+        roleTitle: 'Scegli Ruolo',
+        chooseDom: 'Sono Dominante',
+        chooseSub: 'Sono Sottomesso/a',
+        roleText: 'Nessun ruolo selezionato.',
+        roleTextDom: 'Dominante – controllo calmo e responsabile.',
+        roleTextSub: 'Sottomesso/a – devozione volontaria e ordine.',
+        domLabel: 'Dominanza',
+        subLabel: 'Devozione',
+        rank: 'Rango',
+        rankUnknown: 'Sconosciuto',
+        rankDom1: 'Novizio',
+        rankDom2: 'Guida',
+        rankDom3: 'Fornitore di Struttura',
+        rankDom4: 'Leader di Disciplina',
+        rankDom5: 'Dom Esperto',
+        rankDom6: 'Maestro',
+        rankDom7: 'Gran Maestro',
+        rankDom8: 'Leggenda del Controllo',
+        rankSub1: 'Novizio',
+        rankSub2: 'Apprendista Entusiasta',
+        rankSub3: 'Servitore Leale',
+        rankSub4: 'Adepto Obbediente',
+        rankSub5: 'Sub Esperto',
+        rankSub6: 'Maestro Devoto',
+        rankSub7: 'Servitore Élite',
+        rankSub8: 'Devozione Perfetta',
+        manualTitle: 'Mano',
+        spankingTitle: 'Strumenti per Sculacciare',
+        chastityTitle: 'Castità',
+        bondageTitle: 'Bondage',
+        toysTitle: 'Giocattoli',
+        buy: 'Comprare',
+        achievement100: '{name}, stai progredendo! Continua così!',
+        achievement500: '{name}, stai sviluppando un gusto per questo...',
+        achievement1000: 'Impressionante, {name}! Capisci la dinamica.',
+        achievement5000: '{name}, sei sulla via della maestria!',
+        achievement10000: 'Eccezionale, {name}! La tua dedizione è notevole.',
+        achievement25000: '{name}, sei un modello nel tuo ruolo!',
+        achievement50000: 'Leggendario, {name}! Pochi raggiungono questo livello.',
+        achievement100000: '{name}, hai raggiunto la perfezione assoluta!',
+        manual1: 'Riscaldamento (+2/clic)',
+        manual2: 'Schiaffi Leggeri (+3/clic)',
+        manual3: 'Schiaffi Decisi (+5/clic)',
+        manual4: 'Sculacciata Ritmica (+8/clic)',
+        manual5: 'Sculacciate Intense (+12/clic)',
+        manual6: 'Colpo Potente (+18/clic)',
+        manual7: 'Mano Magistrale (+25/clic)',
+        auto1: 'Frusta Morbida (+2/sec)',
+        auto2: 'Paddle (+4/sec)',
+        auto3: 'Riding Crop (+7/sec)',
+        auto4: 'Flogger (+11/sec)',
+        auto5: 'Cinghia di Cuoio (+16/sec)',
+        auto6: 'Canna (+23/sec)',
+        auto7: 'Set Intenso (+32/sec)',
+        auto8: 'Collezione Premium (+45/sec)',
+        chast1: 'Negazione dell\'Orgasmo (+3/clic, +15/sec)',
+        chast2: 'Gabbia per Pene (+5/clic, +28/sec)',
+        chast3: 'Allenamento Strap-On (+8/clic, +45/sec)',
+        chast4: 'Negazione Prolungata (+12/clic, +70/sec)',
+        chast5: 'Orgasmi Rovinati (+18/clic, +105/sec)',
+        chast6: 'Controllo Totale (+25/clic, +150/sec)',
+        bond1: 'Manette (+40/clic, +200/sec)',
+        bond2: 'Corde & Shibari (+65/clic, +350/sec)',
+        bond3: 'Barra Divaricatrice (+100/clic, +550/sec)',
+        bond4: 'Collare & Guinzaglio (+150/clic, +850/sec)',
+        bond5: 'Attrezzatura da Sospensione (+230/clic, +1300/sec)',
+        bond6: 'Gabbia (+350/clic, +2000/sec)',
+        toy1: 'Candele di Cera (+500/clic, +3000/sec)',
+        toy2: 'Bavaglio (+800/clic, +5000/sec)',
+        toy3: 'Benda (+1200/clic, +8000/sec)',
+        toy4: 'Morsetti per Capezzoli (+1800/clic, +12000/sec)',
+        toy5: 'Elettrostimolazione (+2700/clic, +18000/sec)',
+        toy6: 'Set Premium di Plug (+4000/clic, +27000/sec)',
+        toy7: 'Vibratore Tease & Denial (+6000/clic, +40000/sec)'
+      },
+      pt: {
+        title: 'BDSM Themed Clicker+',
+        flavour: 'Jogo de poder consensual e estilizado entre adultos',
+        namePlaceholder: 'Seu nome...',
+        clickBtn: 'Sirva-me!',
+        clickBtnDom: 'Dar Palmadas',
+        clickBtnSub: 'Receber Palmadas',
+        roleTitle: 'Escolher Papel',
+        chooseDom: 'Sou Dominante',
+        chooseSub: 'Sou Submisso/a',
+        roleText: 'Nenhum papel selecionado.',
+        roleTextDom: 'Dominante – controle calmo e responsável.',
+        roleTextSub: 'Submisso/a – devoção voluntária e ordem.',
+        domLabel: 'Dominância',
+        subLabel: 'Devoção',
+        rank: 'Classificação',
+        rankUnknown: 'Desconhecido',
+        rankDom1: 'Novato',
+        rankDom2: 'Guia',
+        rankDom3: 'Provedor de Estrutura',
+        rankDom4: 'Líder de Disciplina',
+        rankDom5: 'Dom Experiente',
+        rankDom6: 'Mestre',
+        rankDom7: 'Grão-Mestre',
+        rankDom8: 'Lenda do Controle',
+        rankSub1: 'Novato',
+        rankSub2: 'Aprendiz Entusiasta',
+        rankSub3: 'Servo Leal',
+        rankSub4: 'Adepto Obediente',
+        rankSub5: 'Sub Experiente',
+        rankSub6: 'Mestre Devotado',
+        rankSub7: 'Servo Elite',
+        rankSub8: 'Devoção Perfeita',
+        manualTitle: 'Mão',
+        spankingTitle: 'Ferramentas de Palmadas',
+        chastityTitle: 'Castidade',
+        bondageTitle: 'Bondage',
+        toysTitle: 'Brinquedos',
+        buy: 'Comprar',
+        achievement100: '{name}, você está progredindo! Continue!',
+        achievement500: '{name}, você está desenvolvendo gosto por isso...',
+        achievement1000: 'Impressionante, {name}! Você entende a dinâmica.',
+        achievement5000: '{name}, você está no caminho da maestria!',
+        achievement10000: 'Excepcional, {name}! Sua dedicação é notável.',
+        achievement25000: '{name}, você é um modelo em seu papel!',
+        achievement50000: 'Lendário, {name}! Poucos alcançam este nível.',
+        achievement100000: '{name}, você alcançou a perfeição absoluta!',
+        manual1: 'Aquecimento (+2/clique)',
+        manual2: 'Palmadas Suaves (+3/clique)',
+        manual3: 'Palmadas Firmes (+5/clique)',
+        manual4: 'Palmadas Rítmicas (+8/clique)',
+        manual5: 'Palmadas Intensas (+12/clique)',
+        manual6: 'Golpe Poderoso (+18/clique)',
+        manual7: 'Mão Magistral (+25/clique)',
+        auto1: 'Chicote Macio (+2/seg)',
+        auto2: 'Raquete (+4/seg)',
+        auto3: 'Riding Crop (+7/seg)',
+        auto4: 'Chicote (+11/seg)',
+        auto5: 'Tira de Couro (+16/seg)',
+        auto6: 'Cana (+23/seg)',
+        auto7: 'Conjunto Intenso (+32/seg)',
+        auto8: 'Coleção Premium (+45/seg)',
+        chast1: 'Negação de Orgasmo (+3/clique, +15/seg)',
+        chast2: 'Gaiola Peniana (+5/clique, +28/seg)',
+        chast3: 'Treino com Strap-On (+8/clique, +45/seg)',
+        chast4: 'Negação Prolongada (+12/clique, +70/seg)',
+        chast5: 'Orgasmos Arruinados (+18/clique, +105/seg)',
+        chast6: 'Controle Total (+25/clique, +150/seg)',
+        bond1: 'Algemas (+40/clique, +200/seg)',
+        bond2: 'Cordas & Shibari (+65/clique, +350/seg)',
+        bond3: 'Barra Separadora (+100/clique, +550/seg)',
+        bond4: 'Colar & Coleira (+150/clique, +850/seg)',
+        bond5: 'Equipamento de Suspensão (+230/clique, +1300/seg)',
+        bond6: 'Gaiola (+350/clique, +2000/seg)',
+        toy1: 'Velas de Cera (+500/clique, +3000/seg)',
+        toy2: 'Mordaça (+800/clique, +5000/seg)',
+        toy3: 'Venda (+1200/clique, +8000/seg)',
+        toy4: 'Clipes para Mamilos (+1800/clique, +12000/seg)',
+        toy5: 'Eletroestimulação (+2700/clique, +18000/seg)',
+        toy6: 'Set Premium de Plugs (+4000/clique, +27000/seg)',
+        toy7: 'Vibrador Tease & Denial (+6000/clique, +40000/seg)'
+      },
+      nl: {
+        title: 'BDSM Themed Clicker+',
+        flavour: 'Consensueel, gestileerd machtsspel tussen volwassenen',
+        namePlaceholder: 'Jouw naam...',
+        clickBtn: 'Dien mij!',
+        clickBtnDom: 'Geef Spankings',
+        clickBtnSub: 'Ontvang Spankings',
+        roleTitle: 'Kies Rol',
+        chooseDom: 'Ik ben Dominant',
+        chooseSub: 'Ik ben Onderdanig',
+        roleText: 'Geen rol geselecteerd.',
+        roleTextDom: 'Dominant – kalme, verantwoordelijke controle.',
+        roleTextSub: 'Onderdanig – vrijwillige toewijding en orde.',
+        domLabel: 'Dominantie',
+        subLabel: 'Toewijding',
+        rank: 'Rang',
+        rankUnknown: 'Onbekend',
+        rankDom1: 'Beginner',
+        rankDom2: 'Gids',
+        rankDom3: 'Structuurverschaffer',
+        rankDom4: 'Discipline Leider',
+        rankDom5: 'Ervaren Dom',
+        rankDom6: 'Meester',
+        rankDom7: 'Grootmeester',
+        rankDom8: 'Legende van Controle',
+        rankSub1: 'Beginner',
+        rankSub2: 'Enthousiaste Leerling',
+        rankSub3: 'Loyale Dienaar',
+        rankSub4: 'Gehoorzame Adept',
+        rankSub5: 'Ervaren Sub',
+        rankSub6: 'Toegewijde Meester',
+        rankSub7: 'Elite Dienaar',
+        rankSub8: 'Perfecte Toewijding',
+        manualTitle: 'Hand',
+        spankingTitle: 'Spanking Gereedschap',
+        chastityTitle: 'Kuisheid',
+        bondageTitle: 'Bondage',
+        toysTitle: 'Speelgoed',
+        buy: 'Kopen',
+        achievement100: '{name}, je maakt vooruitgang! Ga door!',
+        achievement500: '{name}, je ontwikkelt een smaak hiervoor...',
+        achievement1000: 'Indrukwekkend, {name}! Je begrijpt de dynamiek.',
+        achievement5000: '{name}, je bent op weg naar meesterschap!',
+        achievement10000: 'Uitzonderlijk, {name}! Je toewijding is opmerkelijk.',
+        achievement25000: '{name}, je bent een rolmodel in je positie!',
+        achievement50000: 'Legendarisch, {name}! Weinigen bereiken dit niveau.',
+        achievement100000: '{name}, je hebt absolute perfectie bereikt!',
+        manual1: 'Opwarmen (+2/klik)',
+        manual2: 'Zachte Klappen (+3/klik)',
+        manual3: 'Stevige Klappen (+5/klik)',
+        manual4: 'Ritmische Spanking (+8/klik)',
+        manual5: 'Intense Handspanks (+12/klik)',
+        manual6: 'Krachtige Slag (+18/klik)',
+        manual7: 'Meesterlijke Hand (+25/klik)',
+        auto1: 'Zachte Zweep (+2/sec)',
+        auto2: 'Peddel (+4/sec)',
+        auto3: 'Riding Crop (+7/sec)',
+        auto4: 'Flogger (+11/sec)',
+        auto5: 'Leren Riem (+16/sec)',
+        auto6: 'Rotting (+23/sec)',
+        auto7: 'Intense Set (+32/sec)',
+        auto8: 'Premium Collectie (+45/sec)',
+        chast1: 'Orgasmeweigering (+3/klik, +15/sec)',
+        chast2: 'Peniskooi (+5/klik, +28/sec)',
+        chast3: 'Strap-On Training (+8/klik, +45/sec)',
+        chast4: 'Verlengde Weigering (+12/klik, +70/sec)',
+        chast5: 'Verwoeste Orgasmen (+18/klik, +105/sec)',
+        chast6: 'Totale Controle (+25/klik, +150/sec)',
+        bond1: 'Handboeien (+40/klik, +200/sec)',
+        bond2: 'Touwen & Shibari (+65/klik, +350/sec)',
+        bond3: 'Spreidstang (+100/klik, +550/sec)',
+        bond4: 'Halsband & Riem (+150/klik, +850/sec)',
+        bond5: 'Suspensie Apparatuur (+230/klik, +1300/sec)',
+        bond6: 'Kooi (+350/klik, +2000/sec)',
+        toy1: 'Waskaarsen (+500/klik, +3000/sec)',
+        toy2: 'Knevel (+800/klik, +5000/sec)',
+        toy3: 'Blinddoek (+1200/klik, +8000/sec)',
+        toy4: 'Tepelklemmen (+1800/klik, +12000/sec)',
+        toy5: 'Elektrostimulatie (+2700/klik, +18000/sec)',
+        toy6: 'Premium Plug Set (+4000/klik, +27000/sec)',
+        toy7: 'Tease & Denial Vibrator (+6000/klik, +40000/sec)'
+      },
+      pl: {
+        title: 'BDSM Themed Clicker+',
+        flavour: 'Konsensualna, stylizowana gra władzy między dorosłymi',
+        namePlaceholder: 'Twoje imię...',
+        clickBtn: 'Służ mi!',
+        clickBtnDom: 'Dawaj Klapsy',
+        clickBtnSub: 'Otrzymuj Klapsy',
+        roleTitle: 'Wybierz Rolę',
+        chooseDom: 'Jestem Dominantem',
+        chooseSub: 'Jestem Submisywny/a',
+        roleText: 'Nie wybrano roli.',
+        roleTextDom: 'Dominujący – spokojna, odpowiedzialna kontrola.',
+        roleTextSub: 'Submisywny/a – dobrowolne oddanie i porządek.',
+        domLabel: 'Dominacja',
+        subLabel: 'Oddanie',
+        rank: 'Ranga',
+        rankUnknown: 'Nieznana',
+        rankDom1: 'Nowicjusz',
+        rankDom2: 'Przewodnik',
+        rankDom3: 'Dostawca Struktury',
+        rankDom4: 'Lider Dyscypliny',
+        rankDom5: 'Doświadczony Dom',
+        rankDom6: 'Mistrz',
+        rankDom7: 'Wielki Mistrz',
+        rankDom8: 'Legenda Kontroli',
+        rankSub1: 'Nowicjusz',
+        rankSub2: 'Entuzjastyczny Uczeń',
+        rankSub3: 'Lojalny Sługa',
+        rankSub4: 'Posłuszny Adept',
+        rankSub5: 'Doświadczony Sub',
+        rankSub6: 'Oddany Mistrz',
+        rankSub7: 'Elitarny Sługa',
+        rankSub8: 'Doskonałe Oddanie',
+        manualTitle: 'Ręka',
+        spankingTitle: 'Narzędzia do Klapsów',
+        chastityTitle: 'Czystość',
+        bondageTitle: 'Bondage',
+        toysTitle: 'Zabawki',
+        buy: 'Kup',
+        achievement100: '{name}, robisz postępy! Kontynuuj!',
+        achievement500: '{name}, rozwijasz smak do tego...',
+        achievement1000: 'Imponujące, {name}! Rozumiesz dynamikę.',
+        achievement5000: '{name}, jesteś na drodze do mistrzostwa!',
+        achievement10000: 'Wyjątkowe, {name}! Twoje oddanie jest godne uwagi.',
+        achievement25000: '{name}, jesteś wzorem w swojej roli!',
+        achievement50000: 'Legendarne, {name}! Niewielu osiąga ten poziom.',
+        achievement100000: '{name}, osiągnąłeś/aś absolutną doskonałość!',
+        manual1: 'Rozgrzewka (+2/kliknięcie)',
+        manual2: 'Delikatne Klepnięcia (+3/kliknięcie)',
+        manual3: 'Mocne Klepnięcia (+5/kliknięcie)',
+        manual4: 'Rytmiczne Klapsy (+8/kliknięcie)',
+        manual5: 'Intensywne Klapsy (+12/kliknięcie)',
+        manual6: 'Potężne Uderzenie (+18/kliknięcie)',
+        manual7: 'Mistrzowska Ręka (+25/kliknięcie)',
+        auto1: 'Miękki Bat (+2/sek)',
+        auto2: 'Wiosło (+4/sek)',
+        auto3: 'Riding Crop (+7/sek)',
+        auto4: 'Flogger (+11/sek)',
+        auto5: 'Skórzany Pasek (+16/sek)',
+        auto6: 'Trzcinowa Laska (+23/sek)',
+        auto7: 'Zestaw Intensywny (+32/sek)',
+        auto8: 'Kolekcja Premium (+45/sek)',
+        chast1: 'Odmowa Orgazmu (+3/kliknięcie, +15/sek)',
+        chast2: 'Klatka na Penisa (+5/kliknięcie, +28/sek)',
+        chast3: 'Trening ze Strap-On (+8/kliknięcie, +45/sek)',
+        chast4: 'Przedłużona Odmowa (+12/kliknięcie, +70/sek)',
+        chast5: 'Zrujnowane Orgazmy (+18/kliknięcie, +105/sek)',
+        chast6: 'Całkowita Kontrola (+25/kliknięcie, +150/sek)',
+        bond1: 'Kajdanki (+40/kliknięcie, +200/sek)',
+        bond2: 'Liny & Shibari (+65/kliknięcie, +350/sek)',
+        bond3: 'Rozpórka (+100/kliknięcie, +550/sek)',
+        bond4: 'Obroża & Smycz (+150/kliknięcie, +850/sek)',
+        bond5: 'Sprzęt do Zawieszania (+230/kliknięcie, +1300/sek)',
+        bond6: 'Klatka (+350/kliknięcie, +2000/sek)',
+        toy1: 'Świece Woskowe (+500/kliknięcie, +3000/sek)',
+        toy2: 'Knebel (+800/kliknięcie, +5000/sek)',
+        toy3: 'Opaska na Oczy (+1200/kliknięcie, +8000/sek)',
+        toy4: 'Zaciski na Sutki (+1800/kliknięcie, +12000/sek)',
+        toy5: 'Elektrostymulacja (+2700/kliknięcie, +18000/sek)',
+        toy6: 'Premium Zestaw Plugów (+4000/kliknięcie, +27000/sek)',
+        toy7: 'Wibrator Tease & Denial (+6000/kliknięcie, +40000/sek)'
+      },
+      ru: {
+        title: 'BDSM Themed Clicker+',
+        flavour: 'Консенсуальная, стилизованная игра власти между взрослыми',
+        namePlaceholder: 'Ваше имя...',
+        clickBtn: 'Служи мне!',
+        clickBtnDom: 'Давать Шлепки',
+        clickBtnSub: 'Получать Шлепки',
+        roleTitle: 'Выбрать Роль',
+        chooseDom: 'Я Доминант',
+        chooseSub: 'Я Сабмиссив',
+        roleText: 'Роль не выбрана.',
+        roleTextDom: 'Доминант – спокойный, ответственный контроль.',
+        roleTextSub: 'Сабмиссив – добровольная преданность и порядок.',
+        domLabel: 'Доминирование',
+        subLabel: 'Преданность',
+        rank: 'Ранг',
+        rankUnknown: 'Неизвестно',
+        rankDom1: 'Новичок',
+        rankDom2: 'Проводник',
+        rankDom3: 'Создатель Структуры',
+        rankDom4: 'Лидер Дисциплины',
+        rankDom5: 'Опытный Дом',
+        rankDom6: 'Мастер',
+        rankDom7: 'Гроссмейстер',
+        rankDom8: 'Легенда Контроля',
+        rankSub1: 'Новичок',
+        rankSub2: 'Увлеченный Ученик',
+        rankSub3: 'Верный Слуга',
+        rankSub4: 'Послушный Адепт',
+        rankSub5: 'Опытный Саб',
+        rankSub6: 'Преданный Мастер',
+        rankSub7: 'Элитный Слуга',
+        rankSub8: 'Совершенная Преданность',
+        manualTitle: 'Рука',
+        spankingTitle: 'Инструменты для Шлепков',
+        chastityTitle: 'Целомудрие',
+        bondageTitle: 'Бондаж',
+        toysTitle: 'Игрушки',
+        buy: 'Купить',
+        achievement100: '{name}, ты делаешь успехи! Продолжай!',
+        achievement500: '{name}, ты развиваешь вкус к этому...',
+        achievement1000: 'Впечатляюще, {name}! Ты понимаешь динамику.',
+        achievement5000: '{name}, ты на пути к мастерству!',
+        achievement10000: 'Исключительно, {name}! Твоя преданность замечательна.',
+        achievement25000: '{name}, ты образец для подражания в своей роли!',
+        achievement50000: 'Легендарно, {name}! Немногие достигают этого уровня.',
+        achievement100000: '{name}, ты достиг абсолютного совершенства!',
+        manual1: 'Разминка (+2/клик)',
+        manual2: 'Легкие Шлепки (+3/клик)',
+        manual3: 'Твердые Шлепки (+5/клик)',
+        manual4: 'Ритмичные Шлепки (+8/клик)',
+        manual5: 'Интенсивные Шлепки (+12/клик)',
+        manual6: 'Мощный Удар (+18/клик)',
+        manual7: 'Мастерская Рука (+25/клик)',
+        auto1: 'Мягкий Кнут (+2/сек)',
+        auto2: 'Весло (+4/сек)',
+        auto3: 'Riding Crop (+7/сек)',
+        auto4: 'Флоггер (+11/сек)',
+        auto5: 'Кожаный Ремень (+16/сек)',
+        auto6: 'Трость (+23/сек)',
+        auto7: 'Интенсивный Набор (+32/сек)',
+        auto8: 'Премиум-Коллекция (+45/сек)',
+        chast1: 'Отказ в Оргазме (+3/клик, +15/сек)',
+        chast2: 'Клетка для Члена (+5/клик, +28/сек)',
+        chast3: 'Тренировка со Страпоном (+8/клик, +45/сек)',
+        chast4: 'Продленный Отказ (+12/клик, +70/сек)',
+        chast5: 'Испорченные Оргазмы (+18/клик, +105/сек)',
+        chast6: 'Полный Контроль (+25/клик, +150/сек)',
+        bond1: 'Наручники (+40/клик, +200/сек)',
+        bond2: 'Веревки & Шибари (+65/клик, +350/сек)',
+        bond3: 'Распорка (+100/клик, +550/сек)',
+        bond4: 'Ошейник & Поводок (+150/клик, +850/сек)',
+        bond5: 'Оборудование для Подвешивания (+230/клик, +1300/сек)',
+        bond6: 'Клетка (+350/клик, +2000/сек)',
+        toy1: 'Восковые Свечи (+500/клик, +3000/сек)',
+        toy2: 'Кляп (+800/клик, +5000/сек)',
+        toy3: 'Повязка на Глаза (+1200/клик, +8000/сек)',
+        toy4: 'Зажимы для Сосков (+1800/клик, +12000/сек)',
+        toy5: 'Электростимуляция (+2700/клик, +18000/сек)',
+        toy6: 'Премиум Набор Пробок (+4000/клик, +27000/сек)',
+        toy7: 'Вибратор Tease & Denial (+6000/клик, +40000/сек)'
+      },
+      ja: {
+        title: 'BDSM Themed Clicker+',
+        flavour: '成人間の合意的でスタイリッシュなパワープレイ',
+        namePlaceholder: 'あなたの名前...',
+        clickBtn: '仕えよ！',
+        clickBtnDom: 'スパンキングを与える',
+        clickBtnSub: 'スパンキングを受ける',
+        roleTitle: '役割を選ぶ',
+        chooseDom: '私はドミナントです',
+        chooseSub: '私はサブミッシブです',
+        roleText: '役割が選択されていません。',
+        roleTextDom: 'ドミナント – 冷静で責任あるコントロール。',
+        roleTextSub: 'サブミッシブ – 自発的な献身と秩序。',
+        domLabel: '支配',
+        subLabel: '献身',
+        rank: 'ランク',
+        rankUnknown: '不明',
+        rankDom1: '初心者',
+        rankDom2: 'ガイド',
+        rankDom3: '構造提供者',
+        rankDom4: '規律リーダー',
+        rankDom5: '経験豊富なドム',
+        rankDom6: 'マスター',
+        rankDom7: 'グランドマスター',
+        rankDom8: 'コントロールの伝説',
+        rankSub1: '初心者',
+        rankSub2: '熱心な学習者',
+        rankSub3: '忠実な僕',
+        rankSub4: '従順な熟達者',
+        rankSub5: '経験豊富なサブ',
+        rankSub6: '献身的なマスター',
+        rankSub7: 'エリートサーバント',
+        rankSub8: '完璧な献身',
+        manualTitle: '手',
+        spankingTitle: 'スパンキングツール',
+        chastityTitle: '貞操',
+        bondageTitle: 'ボンデージ',
+        toysTitle: 'おもちゃ',
+        buy: '購入',
+        achievement100: '{name}、進歩しています！続けて！',
+        achievement500: '{name}、味を覚えてきましたね...',
+        achievement1000: '素晴らしい、{name}！ダイナミクスを理解しています。',
+        achievement5000: '{name}、マスターへの道を歩んでいます！',
+        achievement10000: '卓越した、{name}！あなたの献身は注目に値します。',
+        achievement25000: '{name}、あなたは役割のお手本です！',
+        achievement50000: '伝説的、{name}！このレベルに達する人は少ないです。',
+        achievement100000: '{name}、絶対的な完璧を達成しました！',
+        manual1: 'ウォームアップ (+2/クリック)',
+        manual2: '優しいスラップ (+3/クリック)',
+        manual3: '強いスラップ (+5/クリック)',
+        manual4: 'リズミカルなスパンキング (+8/クリック)',
+        manual5: '激しいハンドスパンク (+12/クリック)',
+        manual6: '強力な打撃 (+18/クリック)',
+        manual7: '達人の手 (+25/クリック)',
+        auto1: 'ソフトウィップ (+2/秒)',
+        auto2: 'パドル (+4/秒)',
+        auto3: 'ライディングクロップ (+7/秒)',
+        auto4: 'フロッガー (+11/秒)',
+        auto5: 'レザーストラップ (+16/秒)',
+        auto6: 'ケーン (+23/秒)',
+        auto7: 'インテンスセット (+32/秒)',
+        auto8: 'プレミアムコレクション (+45/秒)',
+        chast1: 'オーガズム拒否 (+3/クリック, +15/秒)',
+        chast2: 'ペニスケージ (+5/クリック, +28/秒)',
+        chast3: 'ストラップオントレーニング (+8/クリック, +45/秒)',
+        chast4: '延長拒否 (+12/クリック, +70/秒)',
+        chast5: '台無しオーガズム (+18/クリック, +105/秒)',
+        chast6: '完全コントロール (+25/クリック, +150/秒)',
+        bond1: '手錠 (+40/クリック, +200/秒)',
+        bond2: 'ロープ＆緊縛 (+65/クリック, +350/秒)',
+        bond3: 'スプレッダーバー (+100/クリック, +550/秒)',
+        bond4: '首輪＆リード (+150/クリック, +850/秒)',
+        bond5: 'サスペンションギア (+230/クリック, +1300/秒)',
+        bond6: 'ケージ (+350/クリック, +2000/秒)',
+        toy1: 'ワックスキャンドル (+500/クリック, +3000/秒)',
+        toy2: 'ギャグ (+800/クリック, +5000/秒)',
+        toy3: 'アイマスク (+1200/クリック, +8000/秒)',
+        toy4: 'ニップルクランプ (+1800/クリック, +12000/秒)',
+        toy5: '電気刺激 (+2700/クリック, +18000/秒)',
+        toy6: 'プレミアムプラグセット (+4000/クリック, +27000/秒)',
+        toy7: 'Tease & Denial バイブレーター (+6000/クリック, +40000/秒)'
+      }
+    };
+
+    let count = 0;
+    let perClick = 1;
+    let autoClicks = 0;
+    let dom = 0;
+    let sub = 0;
+    let role = null;
+    let hasChastity = false;
+    let playerName = '';
+    let achievementsShown = [];
+
+    const counter = document.getElementById('counter');
+    const btn = document.getElementById('clickBtn');
+    const achievementEl = document.getElementById('achievement');
+    let lang = 'de';
+
+    const unlockThresholds = {
+      manual2: 50,
+      manual3: 150,
+      manual4: 300,
+      manual5: 600,
+      manual6: 1200,
+      manual7: 2000,
+      blockSpanking: 250,
+      auto2: 500,
+      auto3: 800,
+      auto4: 1200,
+      auto5: 2000,
+      auto6: 3500,
+      auto7: 5500,
+      auto8: 8500,
+      blockChastity: 5000,
+      chast2: 7000,
+      chast3: 10000,
+      chast4: 15000,
+      chast5: 22000,
+      chast6: 32000,
+      blockBondage: 15000,
+      bond2: 20000,
+      bond3: 35000,
+      bond4: 55000,
+      bond5: 85000,
+      bond6: 130000,
+      blockToys: 60000,
+      toy2: 90000,
+      toy3: 140000,
+      toy4: 220000,
+      toy5: 350000,
+      toy6: 550000,
+      toy7: 900000
+    };
+
+    const manualUpgrades = [
+      {id:'manual1', cost:30, increment:2, costEl:'manual1Cost'},
+      {id:'manual2', cost:60, increment:3, costEl:'manual2Cost'},
+      {id:'manual3', cost:100, increment:5, costEl:'manual3Cost'},
+      {id:'manual4', cost:150, increment:8, costEl:'manual4Cost'},
+      {id:'manual5', cost:220, increment:12, costEl:'manual5Cost'},
+      {id:'manual6', cost:320, increment:18, costEl:'manual6Cost'},
+      {id:'manual7', cost:450, increment:25, costEl:'manual7Cost'}
+    ];
+
+    const autoUpgrades = [
+      {id:'auto1', cost:250, increment:2, costEl:'auto1Cost'},
+      {id:'auto2', cost:400, increment:4, costEl:'auto2Cost'},
+      {id:'auto3', cost:600, increment:7, costEl:'auto3Cost'},
+      {id:'auto4', cost:900, increment:11, costEl:'auto4Cost'},
+      {id:'auto5', cost:1400, increment:16, costEl:'auto5Cost'},
+      {id:'auto6', cost:2100, increment:23, costEl:'auto6Cost'},
+      {id:'auto7', cost:3200, increment:32, costEl:'auto7Cost'},
+      {id:'auto8', cost:4800, increment:45, costEl:'auto8Cost'}
+    ];
+
+    const chastityUpgrades = [
+      {id:'chast1', cost:5000, incrementClick:3, incrementAuto:15, costEl:'chast1Cost'},
+      {id:'chast2', cost:8000, incrementClick:5, incrementAuto:28, costEl:'chast2Cost'},
+      {id:'chast3', cost:12000, incrementClick:8, incrementAuto:45, costEl:'chast3Cost'},
+      {id:'chast4', cost:18000, incrementClick:12, incrementAuto:70, costEl:'chast4Cost'},
+      {id:'chast5', cost:27000, incrementClick:18, incrementAuto:105, costEl:'chast5Cost'},
+      {id:'chast6', cost:40000, incrementClick:25, incrementAuto:150, costEl:'chast6Cost'}
+    ];
+
+    const bondageUpgrades = [
+      {id:'bond1', cost:15000, incrementClick:40, incrementAuto:200, costEl:'bond1Cost'},
+      {id:'bond2', cost:25000, incrementClick:65, incrementAuto:350, costEl:'bond2Cost'},
+      {id:'bond3', cost:40000, incrementClick:100, incrementAuto:550, costEl:'bond3Cost'},
+      {id:'bond4', cost:65000, incrementClick:150, incrementAuto:850, costEl:'bond4Cost'},
+      {id:'bond5', cost:100000, incrementClick:230, incrementAuto:1300, costEl:'bond5Cost'},
+      {id:'bond6', cost:150000, incrementClick:350, incrementAuto:2000, costEl:'bond6Cost'}
+    ];
+
+    const toyUpgrades = [
+      {id:'toy1', cost:60000, incrementClick:500, incrementAuto:3000, costEl:'toy1Cost'},
+      {id:'toy2', cost:100000, incrementClick:800, incrementAuto:5000, costEl:'toy2Cost'},
+      {id:'toy3', cost:160000, incrementClick:1200, incrementAuto:8000, costEl:'toy3Cost'},
+      {id:'toy4', cost:250000, incrementClick:1800, incrementAuto:12000, costEl:'toy4Cost'},
+      {id:'toy5', cost:400000, incrementClick:2700, incrementAuto:18000, costEl:'toy5Cost'},
+      {id:'toy6', cost:650000, incrementClick:4000, incrementAuto:27000, costEl:'toy6Cost'},
+      {id:'toy7', cost:1000000, incrementClick:6000, incrementAuto:40000, costEl:'toy7Cost'}
+    ];
+
+    document.getElementById('nameInput').addEventListener('input', (e) => {
+      playerName = e.target.value;
+    });
+
+    function updateLanguage() {
+      const t = translations[lang];
+      document.getElementById('title').textContent = t.title;
+      document.getElementById('flavour').textContent = t.flavour;
+      document.getElementById('nameInput').placeholder = t.namePlaceholder;
+      document.getElementById('roleTitle').textContent = t.roleTitle;
+      document.getElementById('chooseDom').textContent = t.chooseDom;
+      document.getElementById('chooseSub').textContent = t.chooseSub;
+      document.getElementById('domLabel').textContent = t.domLabel;
+      document.getElementById('subLabel').textContent = t.subLabel;
+      document.getElementById('manualTitle').textContent = t.manualTitle;
+      document.getElementById('spankingTitle').textContent = t.spankingTitle;
+      document.getElementById('chastityTitle').textContent = t.chastityTitle;
+      document.getElementById('bondageTitle').textContent = t.bondageTitle;
+      document.getElementById('toysTitle').textContent = t.toysTitle;
+
+      if (role === 'dom') {
+        btn.textContent = t.clickBtnDom;
+        document.getElementById('roleText').textContent = t.roleTextDom;
+      } else if (role === 'sub') {
+        btn.textContent = t.clickBtnSub;
+        document.getElementById('roleText').textContent = t.roleTextSub;
+      } else {
+        btn.textContent = t.clickBtn;
+        document.getElementById('roleText').textContent = t.roleText;
+      }
+
+      // Update all manual upgrade texts
+      manualUpgrades.forEach((u, i) => {
+        const key = 'manual' + (i + 1);
+        document.getElementById(u.id + 'Text').innerHTML = `${t[key]} – <span id="${u.costEl}">${u.cost}</span>`;
+      });
+
+      // Update all auto upgrade texts
+      autoUpgrades.forEach((u, i) => {
+        const key = 'auto' + (i + 1);
+        document.getElementById(u.id + 'Text').innerHTML = `${t[key]} – <span id="${u.costEl}">${u.cost}</span>`;
+      });
+
+      // Update all chastity upgrade texts
+      chastityUpgrades.forEach((u, i) => {
+        const key = 'chast' + (i + 1);
+        document.getElementById(u.id + 'Text').innerHTML = `${t[key]} – <span id="${u.costEl}">${u.cost}</span>`;
+      });
+
+      // Update all bondage upgrade texts
+      bondageUpgrades.forEach((u, i) => {
+        const key = 'bond' + (i + 1);
+        document.getElementById(u.id + 'Text').innerHTML = `${t[key]} – <span id="${u.costEl}">${u.cost}</span>`;
+      });
+
+      // Update all toy upgrade texts
+      toyUpgrades.forEach((u, i) => {
+        const key = 'toy' + (i + 1);
+        document.getElementById(u.id + 'Text').innerHTML = `${t[key]} – <span id="${u.costEl}">${u.cost}</span>`;
+      });
+
+      updateButtonLabels();
+      updateRank();
+    }
+
+    function updateButtonLabels() {
+      const t = translations[lang];
+      document.querySelectorAll('.upgrader button').forEach(btn => {
+        btn.textContent = t.buy;
+      });
+    }
+
+    document.getElementById('langSelect').onchange = (e) => {
+      lang = e.target.value;
+      updateLanguage();
+    };
+
+    function update() {
+      counter.textContent = Math.floor(count);
+      updateButtonStates();
+      checkUnlocks();
+    }
+
+    function checkUnlocks() {
+      for (const [id, threshold] of Object.entries(unlockThresholds)) {
+        if (count >= threshold) {
+          const el = document.getElementById(id);
+          if (el && el.classList.contains('hidden')) {
+            el.classList.remove('hidden');
+          }
+        }
+      }
+    }
+
+    function updateButtonStates() {
+      manualUpgrades.forEach(u => {
+        const upgraderEl = document.getElementById(u.id);
+        const btn = upgraderEl.querySelector('button');
+        btn.disabled = count < u.cost;
+      });
+      autoUpgrades.forEach(u => {
+        const upgraderEl = document.getElementById(u.id);
+        const btn = upgraderEl.querySelector('button');
+        btn.disabled = count < u.cost;
+      });
+      chastityUpgrades.forEach(u => {
+        const upgraderEl = document.getElementById(u.id);
+        const btn = upgraderEl.querySelector('button');
+        btn.disabled = count < u.cost;
+      });
+      bondageUpgrades.forEach(u => {
+        const upgraderEl = document.getElementById(u.id);
+        const btn = upgraderEl.querySelector('button');
+        btn.disabled = count < u.cost;
+      });
+      toyUpgrades.forEach(u => {
+        const upgraderEl = document.getElementById(u.id);
+        const btn = upgraderEl.querySelector('button');
+        btn.disabled = count < u.cost;
+      });
+    }
+
+    function checkAchievements() {
+      const milestones = [100, 500, 1000, 5000, 10000, 25000, 50000, 100000];
+      milestones.forEach(m => {
+        if (count >= m && !achievementsShown.includes(m)) {
+          showAchievement(m);
+          achievementsShown.push(m);
+        }
+      });
+    }
+
+    function showAchievement(milestone) {
+      const t = translations[lang];
+      const name = playerName || 'Spieler';
+      const key = `achievement${milestone}`;
+      const message = t[key].replace('{name}', name);
+
+      achievementEl.textContent = message;
+      achievementEl.style.display = 'block';
+
+      setTimeout(() => {
+        achievementEl.style.display = 'none';
+      }, 5000);
+    }
+
+    document.getElementById('chooseDom').onclick = () => {
+      role = 'dom';
+      updateLanguage();
+    };
+
+    document.getElementById('chooseSub').onclick = () => {
+      role = 'sub';
+      updateLanguage();
+    };
+
+    btn.onclick = () => {
+      count += perClick;
+
+      if(role === 'dom') {
+        if (hasChastity) {
+          dom += perClick / 5;
+        } else if (dom < 1000) {
+          dom += perClick / 10;
+        } else {
+          dom += perClick / 20;
+        }
+      }
+      if(role === 'sub') {
+        if (hasChastity) {
+          sub += perClick / 5;
+        } else if (sub < 1000) {
+          sub += perClick / 10;
+        } else {
+          sub += perClick / 20;
+        }
+      }
+
+      document.getElementById('domMeter').textContent = Math.floor(dom);
+      document.getElementById('subMeter').textContent = Math.floor(sub);
+      updateRank();
+      update();
+      checkAchievements();
+    };
+
+    manualUpgrades.forEach(u => {
+      const upgraderEl = document.getElementById(u.id);
+      const btn = upgraderEl.querySelector('button');
+      btn.onclick = () => {
+        if (count >= u.cost) {
+          count -= u.cost;
+          perClick += u.increment;
+          u.cost = Math.floor(u.cost * 1.3);
+          document.getElementById(u.costEl).textContent = u.cost;
+          update();
+        }
+      };
+    });
+
+    autoUpgrades.forEach(u => {
+      const upgraderEl = document.getElementById(u.id);
+      const btn = upgraderEl.querySelector('button');
+      btn.onclick = () => {
+        if (count >= u.cost) {
+          count -= u.cost;
+          autoClicks += u.increment;
+          u.cost = Math.floor(u.cost * 1.3);
+          document.getElementById(u.costEl).textContent = u.cost;
+          update();
+        }
+      };
+    });
+
+    chastityUpgrades.forEach(u => {
+      const upgraderEl = document.getElementById(u.id);
+      const btn = upgraderEl.querySelector('button');
+      btn.onclick = () => {
+        if (count >= u.cost) {
+          count -= u.cost;
+          perClick += u.incrementClick;
+          autoClicks += u.incrementAuto;
+          hasChastity = true;
+          u.cost = Math.floor(u.cost * 1.4);
+          document.getElementById(u.costEl).textContent = u.cost;
+          update();
+        }
+      };
+    });
+
+    bondageUpgrades.forEach(u => {
+      const upgraderEl = document.getElementById(u.id);
+      const btn = upgraderEl.querySelector('button');
+      btn.onclick = () => {
+        if (count >= u.cost) {
+          count -= u.cost;
+          perClick += u.incrementClick;
+          autoClicks += u.incrementAuto;
+          u.cost = Math.floor(u.cost * 1.5);
+          document.getElementById(u.costEl).textContent = u.cost;
+          update();
+        }
+      };
+    });
+
+    toyUpgrades.forEach(u => {
+      const upgraderEl = document.getElementById(u.id);
+      const btn = upgraderEl.querySelector('button');
+      btn.onclick = () => {
+        if (count >= u.cost) {
+          count -= u.cost;
+          perClick += u.incrementClick;
+          autoClicks += u.incrementAuto;
+          u.cost = Math.floor(u.cost * 1.6);
+          document.getElementById(u.costEl).textContent = u.cost;
+          update();
+        }
+      };
+    });
+
+    setInterval(() => {
+      count += autoClicks;
+
+      if(role === 'dom') {
+        if (hasChastity) {
+          dom += autoClicks / 50;
+        } else if (dom < 1000) {
+          dom += autoClicks / 100;
+        }
+      }
+      if(role === 'sub') {
+        if (hasChastity) {
+          sub += autoClicks / 50;
+        } else if (sub < 1000) {
+          sub += autoClicks / 100;
+        }
+      }
+
+      document.getElementById('domMeter').textContent = Math.floor(dom);
+      document.getElementById('subMeter').textContent = Math.floor(sub);
+      updateRank();
+      update();
+      checkAchievements();
+    }, 1000);
+
+    function updateRank() {
+      const t = translations[lang];
+      let r = t.rankUnknown;
+      let v = role === 'dom' ? dom : sub;
+      const prefix = role === 'dom' ? 'rankDom' : (role === 'sub' ? 'rankSub' : '');
+
+      if (prefix) {
+        if (v > 50000) r = t[prefix + '8'];
+        else if (v > 20000) r = t[prefix + '7'];
+        else if (v > 8000) r = t[prefix + '6'];
+        else if (v > 3000) r = t[prefix + '5'];
+        else if (v > 1200) r = t[prefix + '4'];
+        else if (v > 500) r = t[prefix + '3'];
+        else if (v > 150) r = t[prefix + '2'];
+        else if (v > 30) r = t[prefix + '1'];
+      }
+
+      document.getElementById('rank').textContent = t.rank + ': ' + r;
+    }
+
+    updateLanguage();
+    update();
+  </script>
+</body>
+</html>
