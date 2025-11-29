@@ -5,30 +5,278 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BDSM Clicker+</title>
   <style>
-    body { font-family: sans-serif; background:#111; color:#eee; display:flex; flex-direction:column; align-items:center; padding:20px; }
-    h1 { color:#c53030; font-size:1.8rem; text-align:center; }
-    #langSelect { margin:10px; padding:8px; background:#222; color:#eee; border:1px solid #c53030; border-radius:8px; font-size:1rem; }
-    #nameInput { margin:10px; padding:8px; background:#222; color:#eee; border:1px solid #c53030; border-radius:8px; font-size:1rem; min-width:200px; text-align:center; }
-    #counter { font-size:2.5rem; margin:15px; text-align:center; }
-    button { padding:10px 20px; font-size:1rem; cursor:pointer; background:#c53030; color:white; border:none; border-radius:12px; flex-shrink:0; }
-    button:disabled { background:#555; cursor:not-allowed; }
-    #updaterRow { display:flex; gap:20px; margin-top:20px; flex-wrap:wrap; justify-content:center; }
-    .updaterBlock { display:flex; flex-direction:column; gap:10px; min-width:200px; }
-    .updaterBlock.hidden { display:none; }
-    .upgrader { display:flex; justify-content:space-between; align-items:center; background:#222; padding:10px 15px; border-radius:12px; flex-wrap:wrap; }
-    .upgrader.hidden { display:none; }
-    .upgrader span { max-width:150px; word-wrap:break-word; font-size:0.9rem; }
-    #meters { display:flex; gap:10px; margin:15px; flex-wrap:wrap; justify-content:center; }
-    .meterbox { background:#222; padding:8px 15px; border-radius:12px; min-width:120px; text-align:center; }
-    #rank { margin-top:15px; font-size:1.2rem; color:#c53030; text-align:center; }
-    #clickRow { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:15px; }
-    #achievement { margin:20px; padding:15px; background:#c53030; border-radius:12px; font-weight:bold; max-width:500px; text-align:center; display:none; }
-    @media (max-width: 500px) {
-      #updaterRow { flex-direction: column; }
-      .updaterBlock { width:100%; }
-      .upgrader { flex-direction: column; align-items:flex-start; gap:5px; }
-      button { width:100%; }
-      .upgrader span { max-width:100%; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: sans-serif;
+      background:#111;
+      color:#eee;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:20px;
+      margin:0;
+      max-width:100vw;
+      overflow-x:hidden;
+    }
+    h1 {
+      color:#c53030;
+      font-size:1.8rem;
+      text-align:center;
+      margin:10px 0;
+    }
+    h2 {
+      font-size:1.3rem;
+      text-align:center;
+      margin:15px 0 10px 0;
+    }
+    h3 {
+      font-size:1.1rem;
+      margin:10px 0;
+      text-align:center;
+    }
+    p {
+      margin:8px 0;
+      text-align:center;
+    }
+    #langSelect {
+      margin:10px;
+      padding:12px 16px;
+      background:#222;
+      color:#eee;
+      border:1px solid #c53030;
+      border-radius:8px;
+      font-size:1rem;
+      min-height:44px;
+      cursor:pointer;
+    }
+    #nameInput {
+      margin:10px;
+      padding:12px 16px;
+      background:#222;
+      color:#eee;
+      border:1px solid #c53030;
+      border-radius:8px;
+      font-size:1rem;
+      min-width:200px;
+      max-width:90vw;
+      text-align:center;
+      min-height:44px;
+    }
+    #counter {
+      font-size:2.5rem;
+      margin:15px;
+      text-align:center;
+      font-weight:bold;
+      color:#c53030;
+    }
+    button {
+      padding:12px 24px;
+      font-size:1rem;
+      cursor:pointer;
+      background:#c53030;
+      color:white;
+      border:none;
+      border-radius:12px;
+      flex-shrink:0;
+      min-height:44px;
+      min-width:44px;
+      transition: background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    button:active {
+      background:#a02020;
+    }
+    button:disabled {
+      background:#555;
+      cursor:not-allowed;
+    }
+    #updaterRow {
+      display:flex;
+      gap:20px;
+      margin-top:20px;
+      flex-wrap:wrap;
+      justify-content:center;
+      width:100%;
+      max-width:1200px;
+    }
+    .updaterBlock {
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      min-width:200px;
+      flex:1;
+    }
+    .updaterBlock.hidden {
+      display:none;
+    }
+    .upgrader {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      background:#222;
+      padding:12px 15px;
+      border-radius:12px;
+      gap:10px;
+    }
+    .upgrader.hidden {
+      display:none;
+    }
+    .upgrader span {
+      flex:1;
+      word-wrap:break-word;
+      font-size:0.9rem;
+      line-height:1.4;
+    }
+    .upgrader button {
+      flex-shrink:0;
+    }
+    #meters {
+      display:flex;
+      gap:10px;
+      margin:15px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    .meterbox {
+      background:#222;
+      padding:10px 15px;
+      border-radius:12px;
+      min-width:120px;
+      text-align:center;
+      font-size:0.95rem;
+    }
+    #rank {
+      margin-top:15px;
+      font-size:1.2rem;
+      color:#c53030;
+      text-align:center;
+      padding:0 10px;
+    }
+    #clickRow {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+      margin-bottom:15px;
+    }
+    #clickBtn {
+      font-size:1.1rem;
+      padding:16px 32px;
+      font-weight:bold;
+    }
+    #achievement {
+      margin:20px 10px;
+      padding:15px;
+      background:#c53030;
+      border-radius:12px;
+      font-weight:bold;
+      max-width:500px;
+      text-align:center;
+      display:none;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    /* Tablet optimization */
+    @media (max-width: 768px) {
+      body { padding:15px 10px; }
+      h1 { font-size:1.5rem; }
+      h2 { font-size:1.2rem; }
+      h3 { font-size:1rem; }
+      #counter { font-size:2rem; }
+      .updaterBlock { min-width:180px; }
+      #updaterRow { gap:15px; }
+    }
+
+    /* Mobile optimization */
+    @media (max-width: 600px) {
+      body { padding:10px 8px; }
+      h1 { font-size:1.3rem; margin:8px 0; }
+      h2 { font-size:1.1rem; margin:12px 0 8px 0; }
+      h3 { font-size:0.95rem; }
+      p { font-size:0.9rem; }
+      #counter { font-size:2.2rem; margin:10px; }
+      #langSelect, #nameInput {
+        width:100%;
+        max-width:100%;
+        margin:8px 0;
+      }
+      button {
+        font-size:0.95rem;
+        padding:12px 20px;
+      }
+      #clickBtn {
+        width:100%;
+        max-width:300px;
+        padding:16px 24px;
+        font-size:1rem;
+      }
+      #updaterRow {
+        flex-direction: column;
+        gap:12px;
+        margin-top:15px;
+      }
+      .updaterBlock {
+        width:100%;
+        min-width:unset;
+      }
+      .upgrader {
+        flex-direction: row;
+        padding:10px 12px;
+        gap:8px;
+      }
+      .upgrader span {
+        font-size:0.85rem;
+      }
+      .upgrader button {
+        padding:10px 16px;
+        font-size:0.9rem;
+      }
+      #meters {
+        width:100%;
+        gap:8px;
+        margin:10px 0;
+      }
+      .meterbox {
+        flex:1;
+        min-width:100px;
+        padding:8px 10px;
+        font-size:0.85rem;
+      }
+      #rank {
+        font-size:1rem;
+        margin-top:10px;
+      }
+      #achievement {
+        margin:15px 5px;
+        padding:12px;
+        font-size:0.9rem;
+      }
+    }
+
+    /* Small mobile devices */
+    @media (max-width: 400px) {
+      body { padding:8px 5px; }
+      h1 { font-size:1.2rem; }
+      #counter { font-size:1.8rem; }
+      .upgrader {
+        flex-direction:column;
+        align-items:stretch;
+      }
+      .upgrader button {
+        width:100%;
+        margin-top:6px;
+      }
+      .upgrader span {
+        max-width:100%;
+        text-align:center;
+      }
+      #meters {
+        flex-direction:column;
+      }
+      .meterbox {
+        width:100%;
+      }
     }
   </style>
 </head>
